@@ -1,17 +1,30 @@
 package main
 
 import (
+	"AutoPartPro/internal/models"
+	"AutoPartPro/internal/repository"
 	"fmt"
-	"log"
-	"net/http"
 )
 
 func main() {
-	// ترحيب بنظام المخزون
-	http.HandleFunc("/inventory", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "AutoPartPro: Inventory Service is Online!")
-	})
+	// 1. إنشاء المخزن
+	repo := repository.NewInventoryRepository()
 
-	log.Println("Inventory Service running on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// 2. إضافة قطعة تجريبية
+	newPart := models.Part{
+		ID:    "1",
+		Name:  "مساعد سيارة",
+		SKU:   "SP-100",
+		Price: 150.5,
+		Stock: 10,
+	}
+	repo.AddPart(newPart)
+
+	// 3. اختبار جلب القطعة
+	part, exists := repo.GetPart("1")
+	if exists {
+		fmt.Printf("تم العثور على القطعة: %s، السعر: %.2f ريال\n", part.Name, part.Price)
+	} else {
+		fmt.Println("القطعة غير موجودة!")
+	}
 }
