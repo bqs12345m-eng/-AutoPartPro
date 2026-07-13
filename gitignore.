@@ -1,0 +1,17 @@
+# binaries and executables
+/main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# local development
+.env
+.DS_Store
+/vendor/
+
+# temp and log files
+*.log
+*.tmp
+*.bak
