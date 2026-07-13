@@ -4,27 +4,27 @@ import (
 	"AutoPartPro/internal/models"
 	"AutoPartPro/internal/repository"
 	"fmt"
+	"net/http"
 )
 
 func main() {
-	// 1. إنشاء المخزن
+	// 1. تهيئة المخزن
 	repo := repository.NewInventoryRepository()
 
 	// 2. إضافة قطعة تجريبية
-	newPart := models.Part{
-		ID:    "1",
-		Name:  "مساعد سيارة",
-		SKU:   "SP-100",
-		Price: 150.5,
-		Stock: 10,
-	}
-	repo.AddPart(newPart)
+	repo.AddPart(models.Part{ID: "1", Name: "مساعد سيارة", Price: 150.5})
 
-	// 3. اختبار جلب القطعة
-	part, exists := repo.GetPart("1")
-	if exists {
-		fmt.Printf("تم العثور على القطعة: %s، السعر: %.2f ريال\n", part.Name, part.Price)
-	} else {
-		fmt.Println("القطعة غير موجودة!")
-	}
+	// 3. تعريف الرابط (API endpoint)
+	http.HandleFunc("/part", func(w http.ResponseWriter, r *http.Request) {
+		part, exists := repo.GetPart("1")
+		if !exists {
+			http.Error(w, "القطعة غير موجودة", http.StatusNotFound)
+			return
+		}
+		fmt.Fprintf(w, "القطعة: %s، السعر: %.2f ريال", part.Name, part.Price)
+	})
+
+	// 4. تشغيل الخادم
+	fmt.Println("الخادم يعمل على :8080")
+	http.ListenAndServe(":8080", nil)
 }
